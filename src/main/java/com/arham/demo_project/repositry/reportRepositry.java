@@ -20,7 +20,7 @@ public interface reportRepositry extends JpaRepository<report, Long> {
     @Query("select r from report r where r.member_id = :member_id")
     public List<report> getbooklistofuser(@Param("member_id") Long memeber_id);
 
-    @Query("select count(r)<=2 from report r where r.member_id = :member_id")
+    @Query("select count(r)<=2 from report r where r.member_id = :member_id and r.return_date is null")
     public boolean howManybooks(@Param("member_id") Long memeber_id);
 
     @Query("select case when count(r) > 0 then true else false end " +
@@ -29,10 +29,6 @@ public interface reportRepositry extends JpaRepository<report, Long> {
 
     @Query("select r from report r where r.book_id = :book_id")
     public List<report> getbooksinfo(@Param("book_id") Long book_id);
-
-    @Query("select case when count(r) > 0 then true else false end from report r " +
-            "where r.book_id = :book_id and r.member_id = :userid and r.return_date is not null")
-    public boolean doesbothexistsandhavenotnull(@Param("userid") Long userid, @Param("book_id") Long book_id);
 
     @Query("select case when count(r) > 0 then true else false end from report r " +
             "where r.book_id = :book_id and r.member_id = :userid and r.return_date is null")

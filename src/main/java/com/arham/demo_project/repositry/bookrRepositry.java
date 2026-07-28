@@ -23,11 +23,11 @@ public interface bookrRepositry extends JpaRepository<book, Long> {
     @Modifying
     @Transactional
     @Query("update book b set b.issue_quantity = b.issue_quantity + 1 where b.id = :id")
-    void increaseissuequatity(@Param("id") Long id);
+    void increaseIssueQuantity(@Param("id") Long id);
 
     @Modifying
     @Transactional
     @Query("update book b set b.issue_quantity = b.issue_quantity - 1 where b.id = :id")
-    void decreaseissuequatity(@Param("id") Long id);
+    void decreaseIssueQuantity(@Param("id") Long id);
 
 }

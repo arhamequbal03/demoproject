@@ -56,7 +56,7 @@ public class userService {
 
     public void editById(Long userId,member info){
         info.setId(userId);
-        if(mepo.isMember(info.getUsername())) {
+        if(userId.equals(repo.getId(info.getUsername())) && mepo.isMember(info.getUsername())) {
             repo.save(info);
         }else
             throw new NoSuchElementException("User not found");
@@ -77,5 +77,9 @@ public class userService {
 
     public long getId(String username){
         return repo.getId(username);
+    }
+
+    public boolean validuser(Long id){
+        return repo.existsById(id);
     }
 }

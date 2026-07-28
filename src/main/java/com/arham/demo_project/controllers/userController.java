@@ -35,7 +35,6 @@ public class userController {
 
     @PostMapping("/login")
     userObject loginUser(@RequestHeader("Authorization") String authHeader) {
-        // authHeader looks like: "Basic YXJoYW06YXJoYW0xMjM="
         userObject user=service.processInfo(authHeader);
         user=service.userValidation(user);
         return user;
@@ -67,7 +66,7 @@ public class userController {
         if("ADMIN".equals(usr.getRole()) && info !=null) {
             service.editById(id, info);
             Map<String,Object> response = new LinkedHashMap<>();
-            response.put("messsage" , "User added successfully");
+            response.put("messsage" , "User modified successfully");
             response.put("body" , info);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }

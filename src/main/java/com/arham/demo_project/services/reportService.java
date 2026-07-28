@@ -38,10 +38,6 @@ public class reportService {
         return repo.getbooksinfo(book_id);
     }
 
-    public boolean doesbothexistsandhavenotnull(Long userid,Long book_id){
-        return repo.doesbothexistsandhavenotnull(userid,book_id);
-    }
-
     public boolean doesbothexistsandhavenull(Long userid,Long book_id){
         return repo.doesbothexistsandhavenull(userid,book_id);
     }

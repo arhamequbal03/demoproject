@@ -56,11 +56,12 @@ public class bookService {
         return repo.isavailable(id);
     }
 
-    public void increaseIssuequatity(Long id){
-        repo.increaseissuequatity(id);
+    public void increaseIssueQuantity(Long id){
+        repo.increaseIssueQuantity(id);
     }
 
-    public void decreaseIssueQuatity(Long id){
-        repo.decreaseissuequatity(id);
+
+    public void decreaseIssueQuantity(Long id){
+        repo.decreaseIssueQuantity(id);
     }
 }
