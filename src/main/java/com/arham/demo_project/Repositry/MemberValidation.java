@@ -10,10 +10,8 @@ public interface MemberValidation extends JpaRepository<Member, Long> {
             "from Member m where m.username = :username")
     Boolean isMember(@Param("username") String username);
 
-    @Query("select case when count(m) > 0 then true else false end " +
-            "from Member m where m.username = :username and m.password = :password")
-    Boolean passwordchecker(@Param("username") String username,
-                            @Param("password") String password);
+    @Query("select m.password from Member m where m.username = :username")
+    String getPassword(@Param("username") String username);
 
     @Query("select case when count(m) > 0 then true else false end " +
             "from Member m where m.username = :username and m.role = 'ADMIN'")

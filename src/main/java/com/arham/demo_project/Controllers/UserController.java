@@ -5,6 +5,7 @@ import com.arham.demo_project.Model.UserObject;
 import com.arham.demo_project.Repositry.MemberRepository;
 import com.arham.demo_project.Repositry.MemberValidation;
 import com.arham.demo_project.Services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,12 +44,12 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    ResponseEntity<Map<String,Object>> addUser(@RequestHeader("Authorization") String authHeader, @RequestBody Member comingUser){
+    ResponseEntity<Map<String,Object>> addUser(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody Member comingUser){
         UserObject usr=service.processInfo(authHeader);
         usr=service.userValidation(usr);
 
         comingUser=comingUser.memberValidation(comingUser);
-        if("ADMIN".equals(usr.getRole()) && comingUser !=null) {
+        if("ADMIN".equalsIgnoreCase(usr.getRole())) {
             service.adduser(comingUser);
             Map<String,Object> response = new LinkedHashMap<>();
             response.put("messsage" , "User added successfully");
@@ -56,38 +57,39 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
         else
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"you are not authorized to perform this operation");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this operation");
     }
 
      @PutMapping("/users/{id}")
-     ResponseEntity<Map<String,Object>> updateUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id,@RequestBody Member info){
+     ResponseEntity<Map<String,Object>> updateUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id, @RequestBody Member info){
         UserObject usr=service.processInfo(authHeader);
         usr=service.userValidation(usr);
 
-        info=info.memberValidation(info);
-        if("ADMIN".equals(usr.getRole()) && info !=null) {
-            service.editById(id, info);
+        if("ADMIN".equalsIgnoreCase(usr.getRole())) {
+            Member updated=service.editById(id, info);
             Map<String,Object> response = new LinkedHashMap<>();
             response.put("messsage" , "User modified successfully");
-            response.put("body" , info);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            response.put("body" , updated);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         else
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"you are not authorized to perform this operation");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this operation");
     }
 
     @DeleteMapping("/users/{id}")
     ResponseEntity<Map<String,Object>>deleteUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id){
         UserObject usr=service.processInfo(authHeader);
         usr=service.userValidation(usr);
-        if("ADMIN".equals(usr.getRole())) {
+        if("ADMIN".equalsIgnoreCase(usr.getRole())) {
+            if(id.equals(service.getId(usr.getName())))
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"You can't delete your own account");
             Member user =service.deleteById(id);
             Map<String,Object> response = new LinkedHashMap<>();
             response.put("messsage" , "User deleted successfully");
             response.put("body" , user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         else
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"you are not authorized to perform this operation");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this operation");
     }
 }
