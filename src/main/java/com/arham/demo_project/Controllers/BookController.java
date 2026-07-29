@@ -1,8 +1,8 @@
 package com.arham.demo_project.Controllers;
-import com.arham.demo_project.model.Book;
-import com.arham.demo_project.model.UserObject;
-import com.arham.demo_project.services.BookService;
-import com.arham.demo_project.services.UserService;
+import com.arham.demo_project.Model.Book;
+import com.arham.demo_project.Model.UserObject;
+import com.arham.demo_project.Services.BookService;
+import com.arham.demo_project.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.arham.demo_project.model;
+package com.arham.demo_project.Model;
 
 public class UserObject {
     private String username;

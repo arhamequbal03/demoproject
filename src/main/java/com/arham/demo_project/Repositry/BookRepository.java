@@ -1,6 +1,6 @@
-package com.arham.demo_project.repositry;
+package com.arham.demo_project.Repositry;
 
-import com.arham.demo_project.model.Book;
+import com.arham.demo_project.Model.Book;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

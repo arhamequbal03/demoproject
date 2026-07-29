@@ -1,8 +1,8 @@
-package com.arham.demo_project.services;
-import com.arham.demo_project.model.Member;
-import com.arham.demo_project.model.UserObject;
-import com.arham.demo_project.repositry.MemberRepository;
-import com.arham.demo_project.repositry.MemberValidation;
+package com.arham.demo_project.Services;
+import com.arham.demo_project.Model.Member;
+import com.arham.demo_project.Model.UserObject;
+import com.arham.demo_project.Repositry.MemberRepository;
+import com.arham.demo_project.Repositry.MemberValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

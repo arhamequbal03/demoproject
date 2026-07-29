@@ -1,7 +1,7 @@
-package com.arham.demo_project.services;
+package com.arham.demo_project.Services;
 
-import com.arham.demo_project.model.Report;
-import com.arham.demo_project.repositry.ReportRepository;
+import com.arham.demo_project.Model.Report;
+import com.arham.demo_project.Repositry.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

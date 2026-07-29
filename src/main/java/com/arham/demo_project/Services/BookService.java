@@ -1,7 +1,7 @@
-package com.arham.demo_project.services;
+package com.arham.demo_project.Services;
 
-import com.arham.demo_project.model.Book;
-import com.arham.demo_project.repositry.BookRepository;
+import com.arham.demo_project.Model.Book;
+import com.arham.demo_project.Repositry.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,9 +1,9 @@
 package com.arham.demo_project.Controllers;
-import com.arham.demo_project.model.Report;
-import com.arham.demo_project.model.UserObject;
-import com.arham.demo_project.services.BookService;
-import com.arham.demo_project.services.ReportService;
-import com.arham.demo_project.services.UserService;
+import com.arham.demo_project.Model.Report;
+import com.arham.demo_project.Model.UserObject;
+import com.arham.demo_project.Services.BookService;
+import com.arham.demo_project.Services.ReportService;
+import com.arham.demo_project.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -99,10 +99,10 @@ public class ReportController {
         usr=userservice.userValidation(usr);
         r1.setMember_id(id);
         if ("ADMIN".equals(usr.getRole())) {
-            if (!service.doesbothexistsandhavenull(r1.getMember_id(), r1.getBook_id()))
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User has not issued this book");
             if(!userservice.validuser(r1.getMember_id()))
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Invalid user");
+            if (!service.doesbothexistsandhavenull(r1.getMember_id(), r1.getBook_id()))
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User has not issued this book");
 
             Timestamp issued = service.getissuedate(r1.getMember_id(), r1.getBook_id());
             bookservice.decreaseIssueQuantity(r1.getBook_id());

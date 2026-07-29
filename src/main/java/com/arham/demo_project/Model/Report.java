@@ -1,4 +1,4 @@
-package com.arham.demo_project.model;
+package com.arham.demo_project.Model;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
