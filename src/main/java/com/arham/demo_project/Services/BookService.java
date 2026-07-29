@@ -15,11 +15,7 @@ public class BookService {
     private BookRepository repo;
 
     public List<Book> getAllBooks(){
-        List<Book> books = repo.findAll();
-        if (books.isEmpty()) {
-            throw new NoSuchElementException("No books found");
-        }
-        return books;
+        return repo.findAll();
     }
 
     public Book getBook(Long id){
@@ -35,12 +31,14 @@ public class BookService {
     }
 
     public Book edit(Long id, Book info){
+        Book existing = repo.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Book not found"));
+        if(info.getTotal_quantity() < existing.getIssue_quantity())
+            throw new ArithmeticException("Total_quantity can't be less than issued quantity");
         info.setId(id);
-        if(repo.validate(id)) {
-            repo.save(info);
-            return info;
-        }else
-            throw new NoSuchElementException("Book not found");
+        info.setIssue_quantity(existing.getIssue_quantity());  // preserve the real loaned count
+        repo.save(info);
+        return info;
     }
 
     public Book delete(Long id){
@@ -48,6 +46,8 @@ public class BookService {
             throw new NoSuchElementException("Book not found");
         }
         Book b=repo.getById(id);
+        if(b.getIssue_quantity()>0)
+            throw new IllegalArgumentException("Book can't be deleted,already issued to someone");
         repo.deleteById(id);
         return b;
     }
