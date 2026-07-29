@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,13 +61,37 @@ public class ReportController {
     }
 
     @GetMapping("/reports/v1/{book_id}")
-    List<Report> viewBookStatus(@RequestHeader("Authorization") String authHeader, @PathVariable Long book_id){
+    ResponseEntity<Map<String,Object>> viewBookStatus(@RequestHeader("Authorization") String authHeader, @PathVariable Long book_id){
         // admin- to see the books status
         usr= userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
         if(! "ADMIN".equals(usr.getRole())) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"you are not authorized");
         if(! service.findbookbyid(book_id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No entries exist");
-        return service.getbooksinfo(book_id);
+
+        List<Report> reports= service.getbooksinfo(book_id);
+        Map<String,Object> response=new LinkedHashMap<>();
+        if(reports.isEmpty()){
+            response.put("message","NO record found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.put("message","Records found");
+        List<Map<String, Object>> reportList = new ArrayList<>();
+        for (Report report : reports) {
+            Map<String, Object> reportMap = new LinkedHashMap<>();
+            reportMap.put("id", report.getBorrow_id());
+            reportMap.put("book_id", report.getBook_id());
+            reportMap.put("member_id", report.getMember_id());
+            reportMap.put("issue_date", report.getIssue_date());
+
+            if (report.getReturn_date() != null) {
+                reportMap.put("return_date", report.getReturn_date());
+                reportMap.put("fine_amount", report.getFine_amount());
+            }
+            reportList.add(reportMap);
+        }
+
+        response.put("Report",reportList);
+        return ResponseEntity.status(HttpStatus.FOUND).body(response);
     }
 
     @PostMapping ("/reports")
