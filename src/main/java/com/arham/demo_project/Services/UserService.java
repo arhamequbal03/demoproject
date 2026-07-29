@@ -51,7 +51,10 @@ public class UserService {
     }
 
     public void adduser(Member user){
-        repo.save(user);
+        if(!mepo.isMember(user.getUsername()))
+            repo.save(user);
+        else
+            throw new IllegalArgumentException("User already exists");
     }
 
     public void editById(Long userId, Member info){
