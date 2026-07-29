@@ -1,0 +1,87 @@
+package com.arham.demo_project.Controllers;
+import com.arham.demo_project.Model.Book;
+import com.arham.demo_project.Model.UserObject;
+import com.arham.demo_project.Services.BookService;
+import com.arham.demo_project.Services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/v1/library")
+public class BookController {
+
+    @Autowired
+    private BookService service;
+    @Autowired
+    private UserService userservice;
+    private UserObject usr=null;
+
+    @GetMapping("/books")
+    List<Book> getBooks(@RequestHeader("Authorization") String authHeader){
+        usr=userservice.processInfo(authHeader);
+        usr=userservice.userValidation(usr);
+        return service.getAllBooks();
+    }
+
+    @GetMapping("/books/{id}")
+    Book getBookById(@RequestHeader("Authorization") String authHeader, @PathVariable Long id){
+        usr=userservice.processInfo(authHeader);
+        usr=userservice.userValidation(usr);
+        return service.getBook(id);
+    }
+
+    @PostMapping("/books")
+    ResponseEntity<Map<String, Object>> addBooks(@RequestHeader("Authorization") String authHeader, @RequestBody Book newbook) {
+        usr=userservice.processInfo(authHeader);
+        usr=userservice.userValidation(usr);
+
+        if("ADMIN".equals(usr.getRole()) && newbook.bookValidator(newbook)){
+            Book saved = service.addBook(newbook);
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("message", "Book added successfully");
+            response.put("book", saved);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        else
+            throw new IllegalArgumentException("Either not authorized or invalid entry");
+    }
+
+    @PutMapping("/books/{id}")
+    ResponseEntity<Map<String, Object>> editBook(@RequestHeader("Authorization") String authHeader, @RequestBody Book info, @PathVariable Long id){
+        usr=userservice.processInfo(authHeader);
+        usr=userservice.userValidation(usr);
+
+        if("ADMIN".equals(usr.getRole()) && info.bookValidator(info)) {
+            Book saved = service.edit(id,info);
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("message", "Book modified successfully");
+            response.put("book", saved);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        else
+            throw new IllegalArgumentException("Either not authorized or invalid entry");
+    }
+
+    @DeleteMapping("/books/{id}")
+    ResponseEntity<Map<String, Object>> deleteBook(@RequestHeader("Authorization") String authHeader,@PathVariable Long id){
+        usr=userservice.processInfo(authHeader);
+        usr=userservice.userValidation(usr);
+
+        if("ADMIN".equals(usr.getRole())) {
+            Book deleted= service.delete(id);
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("message", "Book deleted successfully");
+            response.put("book", deleted);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        else
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not authorized to delete books");
+    }
+}
