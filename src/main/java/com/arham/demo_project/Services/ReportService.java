@@ -46,8 +46,8 @@ public class ReportService {
         repo.save(r1);
     }
 
-    public void updatefine(Long id ,int value){
-        repo.updatefine(id,value);
+    public void updatefine(Long member_id, Long book_id, int value){
+        repo.updatefine(member_id, book_id, value);
     }
 
     public Timestamp getissuedate(Long userid,Long book_id){

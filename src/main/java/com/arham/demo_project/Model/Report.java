@@ -1,6 +1,9 @@
 package com.arham.demo_project.Model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Positive;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
@@ -11,7 +14,11 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long borrow_id;
 
+    @NotNull(message = "Book id can't be null")
+    @Positive(message= "Book_id numeric only")
     private Long book_id;
+
+    @Positive(message= "Member_id numeric only")
     private Long member_id;
 
     @CreationTimestamp
