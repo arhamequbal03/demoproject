@@ -1,6 +1,6 @@
 package com.arham.demo_project.repositry;
 
-import com.arham.demo_project.model.book;
+import com.arham.demo_project.model.Book;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,23 +11,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Repository
-public interface bookrRepositry extends JpaRepository<book, Long> {
+public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("select case when count(b) > 0 then true else false end " +
-            "from book b where b.id = :id")
+            "from Book b where b.id = :id")
     boolean validate(@Param("id") Long id);
 
     @Query("select case when count(b) > 0 then true else false end " +
-            "from book b where b.id = :id and b.total_quantity > b.issue_quantity")
+            "from Book b where b.id = :id and b.total_quantity > b.issue_quantity")
     boolean isavailable(@Param("id") Long id);
 
     @Modifying
     @Transactional
-    @Query("update book b set b.issue_quantity = b.issue_quantity + 1 where b.id = :id")
+    @Query("update Book b set b.issue_quantity = b.issue_quantity + 1 where b.id = :id")
     void increaseIssueQuantity(@Param("id") Long id);
 
     @Modifying
     @Transactional
-    @Query("update book b set b.issue_quantity = b.issue_quantity - 1 where b.id = :id")
+    @Query("update Book b set b.issue_quantity = b.issue_quantity - 1 where b.id = :id")
     void decreaseIssueQuantity(@Param("id") Long id);
 
 }

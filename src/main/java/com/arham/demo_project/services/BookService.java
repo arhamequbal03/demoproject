@@ -1,7 +1,7 @@
 package com.arham.demo_project.services;
 
-import com.arham.demo_project.model.book;
-import com.arham.demo_project.repositry.bookrRepositry;
+import com.arham.demo_project.model.Book;
+import com.arham.demo_project.repositry.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,32 +9,32 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class bookService {
+public class BookService {
 
     @Autowired
-    private bookrRepositry repo;
+    private BookRepository repo;
 
-    public List<book> getAllBooks(){
-        List<book> books = repo.findAll();
+    public List<Book> getAllBooks(){
+        List<Book> books = repo.findAll();
         if (books.isEmpty()) {
             throw new NoSuchElementException("No books found");
         }
         return books;
     }
 
-    public book getBook(Long id){
+    public Book getBook(Long id){
         if(repo.validate(id))
             return repo.getById(id);
         else
             throw new NoSuchElementException("Book not found");
     }
 
-    public book addBook(book b){
+    public Book addBook(Book b){
         repo.save(b);
         return b;
     }
 
-    public book edit(Long id,book info){
+    public Book edit(Long id, Book info){
         info.setId(id);
         if(repo.validate(id)) {
             repo.save(info);
@@ -43,11 +43,11 @@ public class bookService {
             throw new NoSuchElementException("Book not found");
     }
 
-    public book delete(Long id){
+    public Book delete(Long id){
         if (!repo.existsById(id)) {
             throw new NoSuchElementException("Book not found");
         }
-        book b=repo.getById(id);
+        Book b=repo.getById(id);
         repo.deleteById(id);
         return b;
     }

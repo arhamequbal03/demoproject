@@ -1,9 +1,9 @@
-package com.arham.demo_project.controllers;
-import com.arham.demo_project.model.report;
-import com.arham.demo_project.model.userObject;
-import com.arham.demo_project.services.bookService;
-import com.arham.demo_project.services.reportService;
-import com.arham.demo_project.services.userService;
+package com.arham.demo_project.Controllers;
+import com.arham.demo_project.model.Report;
+import com.arham.demo_project.model.UserObject;
+import com.arham.demo_project.services.BookService;
+import com.arham.demo_project.services.ReportService;
+import com.arham.demo_project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +18,21 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/library")
-public class reportController {
+public class ReportController {
 
     @Autowired
-    private reportService service;
+    private ReportService service;
 
     @Autowired
-    private bookService bookservice;
+    private BookService bookservice;
 
     @Autowired
-    private userService userservice;
+    private UserService userservice;
 
-    private userObject usr=null;
+    private UserObject usr=null;
 
     @GetMapping("/reports")
-    List<report> viewIssuedAllBooks(@RequestHeader("Authorization") String authHeader){
+    List<Report> viewIssuedAllBooks(@RequestHeader("Authorization") String authHeader){
         // only admin can see this info
         usr= userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
@@ -43,7 +43,7 @@ public class reportController {
     }
 
     @GetMapping("/reports/{userid}")
-    List<report> getBookByUserId(@RequestHeader("Authorization") String authHeader,@PathVariable Long userid){
+    List<Report> getBookByUserId(@RequestHeader("Authorization") String authHeader, @PathVariable Long userid){
         // books that user possess, this info what books are issued
         usr= userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
@@ -60,7 +60,7 @@ public class reportController {
     }
 
     @GetMapping("/reports/v1/{book_id}")
-    List<report> viewBookStatus(@RequestHeader("Authorization") String authHeader,@PathVariable Long book_id){
+    List<Report> viewBookStatus(@RequestHeader("Authorization") String authHeader, @PathVariable Long book_id){
         // admin- to see the books status
         usr= userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
@@ -70,7 +70,7 @@ public class reportController {
     }
 
     @PostMapping ("/reports")
-    ResponseEntity<Map<String, Object>> issueBook(@RequestHeader("Authorization") String authHeader, @RequestBody report r1) {
+    ResponseEntity<Map<String, Object>> issueBook(@RequestHeader("Authorization") String authHeader, @RequestBody Report r1) {
         // from requestbody u will get userId and bookId - only admin
         usr= userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
@@ -92,7 +92,7 @@ public class reportController {
     }
 
     @PostMapping("/reports/{id}")
-    ResponseEntity<Map<String,Object>> returnBook(@PathVariable("id") Long id,@RequestHeader("Authorization") String authHeader, @RequestBody report r1){
+    ResponseEntity<Map<String,Object>> returnBook(@PathVariable("id") Long id,@RequestHeader("Authorization") String authHeader, @RequestBody Report r1){
         // get the userid in query
         // System.out.println("entered");
         usr= userservice.processInfo(authHeader);

@@ -1,6 +1,6 @@
 package com.arham.demo_project.model;
 
-public class userObject {
+public class UserObject {
     private String username;
     private String password;
     private String role;

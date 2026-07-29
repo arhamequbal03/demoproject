@@ -1,8 +1,8 @@
 package com.arham.demo_project.services;
-import com.arham.demo_project.model.member;
-import com.arham.demo_project.model.userObject;
-import com.arham.demo_project.repositry.memberRepositry;
-import com.arham.demo_project.repositry.memberValidation;
+import com.arham.demo_project.model.Member;
+import com.arham.demo_project.model.UserObject;
+import com.arham.demo_project.repositry.MemberRepository;
+import com.arham.demo_project.repositry.MemberValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -11,15 +11,15 @@ import java.util.Base64;
 import java.util.NoSuchElementException;
 
 @Service
-public class userService {
+public class UserService {
 
     @Autowired
-    private memberRepositry repo;
+    private MemberRepository repo;
 
     @Autowired
-    private memberValidation mepo;
+    private MemberValidation mepo;
 
-    public userObject processInfo(String authHeader){
+    public UserObject processInfo(String authHeader){
         if (authHeader == null || !authHeader.startsWith("Basic ")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad Request");
         }
@@ -27,13 +27,13 @@ public class userService {
         String decoded = new String(Base64.getDecoder().decode(base64));  // "username:password"
         String[] parts = decoded.split(":", 2);
 
-        userObject user=new userObject();
+        UserObject user=new UserObject();
         user.setName(parts[0]);
         user.setPassword(parts[1]);
         return user;
     }
 
-    public userObject userValidation(userObject user){
+    public UserObject userValidation(UserObject user){
         String username = user.getName();
         String password = user.getPassword();
 
@@ -50,11 +50,11 @@ public class userService {
         return user;
     }
 
-    public void adduser(member user){
+    public void adduser(Member user){
         repo.save(user);
     }
 
-    public void editById(Long userId,member info){
+    public void editById(Long userId, Member info){
         info.setId(userId);
         if(userId.equals(repo.getId(info.getUsername())) && mepo.isMember(info.getUsername())) {
             repo.save(info);
@@ -62,8 +62,8 @@ public class userService {
             throw new NoSuchElementException("User not found");
     }
 
-    public member deleteById(Long userId){
-        member m = repo.getById(userId);
+    public Member deleteById(Long userId){
+        Member m = repo.getById(userId);
         if(repo.existsById(userId)) {
             repo.deleteById(userId);
             return m;

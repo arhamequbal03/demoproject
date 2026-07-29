@@ -1,8 +1,8 @@
-package com.arham.demo_project.controllers;
-import com.arham.demo_project.model.book;
-import com.arham.demo_project.model.userObject;
-import com.arham.demo_project.services.bookService;
-import com.arham.demo_project.services.userService;
+package com.arham.demo_project.Controllers;
+import com.arham.demo_project.model.Book;
+import com.arham.demo_project.model.UserObject;
+import com.arham.demo_project.services.BookService;
+import com.arham.demo_project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,35 +15,35 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/library")
-public class bookController {
+public class BookController {
 
     @Autowired
-    private bookService service;
+    private BookService service;
     @Autowired
-    private userService userservice;
-    private userObject usr=null;
+    private UserService userservice;
+    private UserObject usr=null;
 
     @GetMapping("/books")
-    List<book> getBooks(@RequestHeader("Authorization") String authHeader){
+    List<Book> getBooks(@RequestHeader("Authorization") String authHeader){
         usr=userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
         return service.getAllBooks();
     }
 
     @GetMapping("/books/{id}")
-    book getBookById(@RequestHeader("Authorization") String authHeader,@PathVariable Long id){
+    Book getBookById(@RequestHeader("Authorization") String authHeader, @PathVariable Long id){
         usr=userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
         return service.getBook(id);
     }
 
     @PostMapping("/books")
-    ResponseEntity<Map<String, Object>> addBooks(@RequestHeader("Authorization") String authHeader, @RequestBody book newbook) {
+    ResponseEntity<Map<String, Object>> addBooks(@RequestHeader("Authorization") String authHeader, @RequestBody Book newbook) {
         usr=userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
 
         if("ADMIN".equals(usr.getRole()) && newbook.bookValidator(newbook)){
-            book saved = service.addBook(newbook);
+            Book saved = service.addBook(newbook);
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("message", "Book added successfully");
             response.put("book", saved);
@@ -54,12 +54,12 @@ public class bookController {
     }
 
     @PutMapping("/books/{id}")
-    ResponseEntity<Map<String, Object>> editBook(@RequestHeader("Authorization") String authHeader,@RequestBody book info, @PathVariable Long id){
+    ResponseEntity<Map<String, Object>> editBook(@RequestHeader("Authorization") String authHeader, @RequestBody Book info, @PathVariable Long id){
         usr=userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
 
         if("ADMIN".equals(usr.getRole()) && info.bookValidator(info)) {
-            book saved = service.edit(id,info);
+            Book saved = service.edit(id,info);
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("message", "Book modified successfully");
             response.put("book", saved);
@@ -75,7 +75,7 @@ public class bookController {
         usr=userservice.userValidation(usr);
 
         if("ADMIN".equals(usr.getRole())) {
-            book deleted= service.delete(id);
+            Book deleted= service.delete(id);
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("message", "Book deleted successfully");
             response.put("book", deleted);

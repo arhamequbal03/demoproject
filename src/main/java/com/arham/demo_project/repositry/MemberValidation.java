@@ -1,21 +1,21 @@
 package com.arham.demo_project.repositry;
 
-import com.arham.demo_project.model.member;
+import com.arham.demo_project.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface memberValidation extends JpaRepository<member, Long> {
+public interface MemberValidation extends JpaRepository<Member, Long> {
     @Query("select case when count(m) > 0 then true else false end " +
-            "from member m where m.username = :username")
+            "from Member m where m.username = :username")
     Boolean isMember(@Param("username") String username);
 
     @Query("select case when count(m) > 0 then true else false end " +
-            "from member m where m.username = :username and m.password = :password")
+            "from Member m where m.username = :username and m.password = :password")
     Boolean passwordchecker(@Param("username") String username,
                             @Param("password") String password);
 
     @Query("select case when count(m) > 0 then true else false end " +
-            "from member m where m.username = :username and m.role = 'ADMIN'")
+            "from Member m where m.username = :username and m.role = 'ADMIN'")
     Boolean setrole(@Param("username") String username);
 }

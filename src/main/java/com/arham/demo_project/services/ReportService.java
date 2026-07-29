@@ -1,7 +1,7 @@
 package com.arham.demo_project.services;
 
-import com.arham.demo_project.model.report;
-import com.arham.demo_project.repositry.reportRepositry;
+import com.arham.demo_project.model.Report;
+import com.arham.demo_project.repositry.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class reportService {
+public class ReportService {
 
     @Autowired
-    private reportRepositry repo;
+    private ReportRepository repo;
 
-    public List<report> viewbooks(){
-        List<report> report= repo.findAll();
+    public List<Report> viewbooks(){
+        List<Report> report= repo.findAll();
         if(! report.isEmpty()) return report;
         else
             throw new NoSuchElementException("Nothing borrowed till now");
@@ -26,7 +26,7 @@ public class reportService {
         return repo.finduserbyid(id);
     }
 
-    public List<report> getissuedbook(Long userid){
+    public List<Report> getissuedbook(Long userid){
         return repo.getbooklistofuser(userid);
     }
 
@@ -34,7 +34,7 @@ public class reportService {
         return repo.findbookbyid(book_id);
     }
 
-    public List<report> getbooksinfo(Long book_id){
+    public List<Report> getbooksinfo(Long book_id){
         return repo.getbooksinfo(book_id);
     }
 
@@ -42,7 +42,7 @@ public class reportService {
         return repo.doesbothexistsandhavenull(userid,book_id);
     }
 
-    public void insertentry(report r1){
+    public void insertentry(Report r1){
         repo.save(r1);
     }
 

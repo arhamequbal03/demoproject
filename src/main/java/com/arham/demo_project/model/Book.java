@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.NoSuchElementException;
 
 @Entity
-public class book {
+public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -55,7 +55,7 @@ public class book {
         this.book_price = book_price;
     }
 
-    public boolean bookValidator(book b){
+    public boolean bookValidator(Book b){
         String title= b.getTitle();
         int total_quantity=b.getTotal_quantity();
         int issue_quantity=b.getIssue_quantity();

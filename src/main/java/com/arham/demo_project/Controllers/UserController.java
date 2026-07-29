@@ -1,10 +1,10 @@
-package com.arham.demo_project.controllers;
+package com.arham.demo_project.Controllers;
 
-import com.arham.demo_project.model.member;
-import com.arham.demo_project.model.userObject;
-import com.arham.demo_project.repositry.memberRepositry;
-import com.arham.demo_project.repositry.memberValidation;
-import com.arham.demo_project.services.userService;
+import com.arham.demo_project.model.Member;
+import com.arham.demo_project.model.UserObject;
+import com.arham.demo_project.repositry.MemberRepository;
+import com.arham.demo_project.repositry.MemberValidation;
+import com.arham.demo_project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,32 +17,32 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/library")
-public class userController {
+public class UserController {
 
     @Autowired
-    private memberValidation mepo;
+    private MemberValidation mepo;
 
     @Autowired
-    private memberRepositry temp;
+    private MemberRepository temp;
 
     @Autowired
-    private userService service;
+    private UserService service;
 
     @GetMapping("/getuser")
-    public List<member> getUser(){
+    public List<Member> getUser(){
         return temp.findAll();
     }
 
     @PostMapping("/login")
-    userObject loginUser(@RequestHeader("Authorization") String authHeader) {
-        userObject user=service.processInfo(authHeader);
+    UserObject loginUser(@RequestHeader("Authorization") String authHeader) {
+        UserObject user=service.processInfo(authHeader);
         user=service.userValidation(user);
         return user;
     }
 
     @PostMapping("/users")
-    ResponseEntity<Map<String,Object>> addUser(@RequestHeader("Authorization") String authHeader, @RequestBody member comingUser){
-        userObject usr=service.processInfo(authHeader);
+    ResponseEntity<Map<String,Object>> addUser(@RequestHeader("Authorization") String authHeader, @RequestBody Member comingUser){
+        UserObject usr=service.processInfo(authHeader);
         usr=service.userValidation(usr);
 
         comingUser=comingUser.memberValidation(comingUser);
@@ -58,8 +58,8 @@ public class userController {
     }
 
      @PutMapping("/users/{id}")
-     ResponseEntity<Map<String,Object>> updateUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id,@RequestBody member info){
-        userObject usr=service.processInfo(authHeader);
+     ResponseEntity<Map<String,Object>> updateUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id,@RequestBody Member info){
+        UserObject usr=service.processInfo(authHeader);
         usr=service.userValidation(usr);
 
         info=info.memberValidation(info);
@@ -76,10 +76,10 @@ public class userController {
 
     @DeleteMapping("/users/{id}")
     ResponseEntity<Map<String,Object>>deleteUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id){
-        userObject usr=service.processInfo(authHeader);
+        UserObject usr=service.processInfo(authHeader);
         usr=service.userValidation(usr);
         if("ADMIN".equals(usr.getRole())) {
-            member user =service.deleteById(id);
+            Member user =service.deleteById(id);
             Map<String,Object> response = new LinkedHashMap<>();
             response.put("messsage" , "User deleted successfully");
             response.put("body" , user);
