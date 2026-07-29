@@ -2,6 +2,10 @@ package com.arham.demo_project;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,8 +36,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ArithmeticException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, Object> handleArithmetic(Exception e) {
+    public Map<String, Object> handleArithmetic(ArithmeticException e) {
         return body(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleValidation(MethodArgumentNotValidException e) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .reduce((a, b) -> a + "; " + b)
+                .orElse("Validation failed");
+        return body(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -54,6 +68,24 @@ public class GlobalExceptionHandler {
     public Map<String, Object> handleNoPath(NoHandlerFoundException e) {
         return body(HttpStatus.NOT_FOUND,
                 "No endpoint found for " + e.getHttpMethod() + " " + e.getRequestURL());
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleMissingHeader(MissingRequestHeaderException e) {
+        return body(HttpStatus.BAD_REQUEST, "Missing required header: " + e.getHeaderName());
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public Map<String, Object> handleMethodNotAllowed(HttpRequestMethodNotSupportedException e) {
+        return body(HttpStatus.METHOD_NOT_ALLOWED, e.getMethod() + " is not supported for this endpoint");
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+    public Map<String, Object> handleUnsupportedMedia(HttpMediaTypeNotSupportedException e) {
+        return body(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Content-Type not supported: " + e.getContentType());
     }
 
     @ExceptionHandler(Exception.class)   // catch-all safety net
