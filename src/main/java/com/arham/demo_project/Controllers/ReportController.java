@@ -145,8 +145,3 @@ public class ReportController {
         }
     }
 }
-/*
-Caveats in implementation
-Note:
-    if book is not returned we should not show fine and return date
- */
