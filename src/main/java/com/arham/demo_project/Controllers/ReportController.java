@@ -2,6 +2,7 @@ package com.arham.demo_project.Controllers;
 import com.arham.demo_project.Model.Report;
 import com.arham.demo_project.Model.UserObject;
 import com.arham.demo_project.Services.BookService;
+import com.arham.demo_project.Services.CustomMessage;
 import com.arham.demo_project.Services.ReportService;
 import com.arham.demo_project.Services.UserService;
 import jakarta.validation.Valid;
@@ -10,11 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +24,8 @@ public class ReportController {
     private BookService bookservice;
     @Autowired
     private UserService userservice;
+    @Autowired
+    private CustomMessage MessageService;
 
     @GetMapping("/reports")
     List<Report> viewIssuedAllBooks(@RequestHeader("Authorization") String authHeader){
@@ -45,9 +43,10 @@ public class ReportController {
         // books that user possess, this info what books are issued
         UserObject usr= userservice.processInfo(authHeader);
         usr=userservice.userValidation(usr);
-        // member ke auth se wo kisi k bhi dekh skta hai
+
+        // Member is not authorized to see anyone's report
         if("MEMBER".equalsIgnoreCase(usr.getRole())){
-            if(userid != userservice.getId(usr.getName())){
+            if(!userid.equals(userservice.getId(usr.getName()))){
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this action");
             }
         }
@@ -66,28 +65,11 @@ public class ReportController {
         if(! service.findbookbyid(book_id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No entries exist");
 
         List<Report> reports= service.getbooksinfo(book_id);
-        Map<String,Object> response=new LinkedHashMap<>();
-        if(reports.isEmpty()){
-            response.put("message","NO record found");
+        Map<String,Object> response=MessageService.GenerateCustomReport(reports);
+
+        if(response.get("message").equals("No record found"))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-        response.put("message","Records found");
-        List<Map<String, Object>> reportList = new ArrayList<>();
-        for (Report report : reports) {
-            Map<String, Object> reportMap = new LinkedHashMap<>();
-            reportMap.put("id", report.getBorrow_id());
-            reportMap.put("book_id", report.getBook_id());
-            reportMap.put("member_id", report.getMember_id());
-            reportMap.put("issue_date", report.getIssue_date());
 
-            if (report.getReturn_date() != null) {
-                reportMap.put("return_date", report.getReturn_date());
-                reportMap.put("fine_amount", report.getFine_amount());
-            }
-            reportList.add(reportMap);
-        }
-
-        response.put("Report",reportList);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -98,20 +80,16 @@ public class ReportController {
         usr=userservice.userValidation(usr);
 
         if("ADMIN".equalsIgnoreCase(usr.getRole())){
-            if(r1.getMember_id()==null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"member_id is required");
-            if(!userservice.validuser(r1.getMember_id())) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Invalid user");
-            if(!bookservice.isavailable(r1.getBook_id())) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"book is unavailable");
-            if(!service.howManybooks(r1.getMember_id()))  throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Borrow Limit already reached");
-            if(service.doesbothexistsandhavenull(r1.getMember_id(),r1.getBook_id()))
-                throw new ResponseStatusException(HttpStatus.CONFLICT,"Book is already with user");
-            r1.setBorrow_id(null);
-            r1.setReturn_date(null);
-            r1.setFine_amount(0);
-            bookservice.increaseIssueQuantity(r1.getBook_id());
-            service.insertentry(r1);
-            Map<String ,Object> response= new LinkedHashMap<>();
-            response.put("message","Book issued successfully");
-            response.put("body",r1);
+            Long MemberId=r1.getMember_id();
+            Long BookId=r1.getBook_id();
+            if(MemberId==null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"member_id is required");
+            userservice.validuser(MemberId); // throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Invalid user");
+            bookservice.isavailable(BookId); // throw new ResponseStatusException(HttpStatus.NOT_FOUND,"book is unavailable");
+            service.howManybooks(MemberId);  // throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Borrow Limit already reached");
+            if(service.doesbothexistsandhavenull(MemberId,BookId))
+                throw new ResponseStatusException(HttpStatus.CONFLICT
+                        , "Book is already with user");
+            Map<String,Object> response= MessageService.GenerateIssueMessage(r1);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }else
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this operation");
@@ -125,21 +103,14 @@ public class ReportController {
         usr=userservice.userValidation(usr);
         r1.setMember_id(id);
         if ("ADMIN".equalsIgnoreCase(usr.getRole())) {
-            if(!userservice.validuser(r1.getMember_id()))
+            Long MemberId=r1.getMember_id();
+            Long BookId=r1.getBook_id();
+            if(!userservice.validuser(MemberId))
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Invalid user");
-            if (!service.doesbothexistsandhavenull(r1.getMember_id(), r1.getBook_id()))
+            if (!service.doesbothexistsandhavenull(MemberId, BookId))
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User has not issued this book");
 
-            Timestamp issued = service.getissuedate(r1.getMember_id(), r1.getBook_id());
-            bookservice.decreaseIssueQuantity(r1.getBook_id());
-            long datediff = ChronoUnit.DAYS.between(issued.toLocalDateTime(), LocalDateTime.now());
-            int value = (int) Math.max(0, datediff - 14) * 2;
-            service.updatefine(r1.getMember_id(), r1.getBook_id(), value);
-            userservice.updateTotalDues(r1.getMember_id(), value);
-            service.updateReturnDate(r1.getMember_id(), r1.getBook_id());
-            Map<String ,Object> response= new LinkedHashMap<>();
-            response.put("message","Book returned successfully");
-            response.put("body","member_id:"+r1.getMember_id()+", book_id : "+ r1.getBook_id()) ;
+            Map<String ,Object> response= MessageService.GenerateReturnMessage(MemberId,BookId);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "you are not authorized to perform this operation");

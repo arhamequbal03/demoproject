@@ -3,7 +3,9 @@ package com.arham.demo_project.Services;
 import com.arham.demo_project.Model.Report;
 import com.arham.demo_project.Repositry.ReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -55,6 +57,7 @@ public class ReportService {
     }
 
     public boolean howManybooks(Long id){
+        if(!repo.howManybooks(id)) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Borrow Limit already reached");
         return repo.howManybooks(id);
     }
 

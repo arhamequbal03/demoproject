@@ -30,10 +30,10 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    @GetMapping("/getuser")
-    public List<Member> getUser(){
-        return temp.findAll();
-    }
+//    @GetMapping("/getuser")
+//    public List<Member> getUser(){
+//        return temp.findAll();
+//    }
 
     @PostMapping("/login")
     UUID loginUser(@RequestHeader("Authorization") String authHeader) {

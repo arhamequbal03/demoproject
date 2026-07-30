@@ -108,6 +108,7 @@ public class UserService {
     }
 
     public boolean validuser(Long id){
+        if(!repo.existsById(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Invalid user");
         return repo.existsById(id);
     }
 }

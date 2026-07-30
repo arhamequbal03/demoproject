@@ -3,7 +3,9 @@ package com.arham.demo_project.Services;
 import com.arham.demo_project.Model.Book;
 import com.arham.demo_project.Repositry.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -53,6 +55,7 @@ public class BookService {
     }
 
     public boolean isavailable(Long id){
+        if(!repo.isavailable(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"book is unavailable");
         return repo.isavailable(id);
     }
 
