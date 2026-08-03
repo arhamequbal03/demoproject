@@ -4,7 +4,6 @@ import com.arham.demo_project.Model.UserObject;
 import com.arham.demo_project.Repositry.MemberRepository;
 import com.arham.demo_project.Repositry.MemberValidation;
 import com.arham.demo_project.Repositry.ReportRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,17 +13,17 @@ import java.util.NoSuchElementException;
 @Service
 public class UserService {
 
-    @Autowired
-    private MemberRepository repo;
+    private final MemberRepository repo;
+    private final MemberValidation mepo;
+    private final ReportRepository reportRepo;
+    private final PasswordManager passwordManager;
 
-    @Autowired
-    private MemberValidation mepo;
-
-    @Autowired
-    private ReportRepository reportRepo;
-
-    @Autowired
-    private PasswordManager passwordManager;
+    public UserService(MemberRepository repo, MemberValidation mepo, ReportRepository reportRepo, PasswordManager passwordManager) {
+        this.repo = repo;
+        this.mepo = mepo;
+        this.reportRepo = reportRepo;
+        this.passwordManager = passwordManager;
+    }
 
     public UserObject processInfo(String authHeader){
         if (authHeader == null || !authHeader.startsWith("Basic ")) {

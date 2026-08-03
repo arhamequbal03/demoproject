@@ -3,7 +3,6 @@ package com.arham.demo_project.Services;
 import com.arham.demo_project.Model.Book;
 import com.arham.demo_project.Model.Report;
 import com.arham.demo_project.Repositry.ReportRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +17,15 @@ import java.util.NoSuchElementException;
 @Service
 public class ReportService {
 
-    @Autowired
-    private ReportRepository repo;
-    @Autowired
-    private BookService bookService;
-    @Autowired
-    private UserService userService;
+    private final ReportRepository repo;
+    private final BookService bookService;
+    private final UserService userService;
+
+    public ReportService(ReportRepository repo, BookService bookService, UserService userService) {
+        this.repo = repo;
+        this.bookService = bookService;
+        this.userService = userService;
+    }
 
     public List<Report> viewbooks(){
         List<Report> report= repo.findAll();
@@ -109,6 +111,6 @@ public class ReportService {
         updatefine(MemberId, BookId, value);
         userService.updateTotalDues(MemberId, value);
         updateReturnDate(MemberId, BookId);
-        book.setIssue_quantity(book.getIssue_quantity() - 1); // dirty-checked, flushed on commit
+        book.setIssue_quantity(book.getIssue_quantity() - 1); // dirty-checked, flushed on commit, this is due to hibernate
     }
 }

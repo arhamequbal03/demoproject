@@ -2,7 +2,6 @@ package com.arham.demo_project.Services;
 
 import com.arham.demo_project.Model.Book;
 import com.arham.demo_project.Repositry.BookRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,8 +12,11 @@ import java.util.NoSuchElementException;
 @Service
 public class BookService {
 
-    @Autowired
-    private BookRepository repo;
+    private final BookRepository repo;
+
+    public BookService(BookRepository repo) {
+        this.repo = repo;
+    }
 
     public List<Book> getAllBooks(){
         return repo.findAll();
@@ -54,23 +56,9 @@ public class BookService {
         return b;
     }
 
-    public boolean isavailable(Long id){
-        if(!repo.isavailable(id)) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"book is unavailable");
-        return repo.isavailable(id);
-    }
-
     // Fetches the book with a row lock; must be called inside a transaction.
     public Book getBookForUpdate(Long id){
         return repo.findByIdForUpdate(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "book is unavailable"));
-    }
-
-    public void increaseIssueQuantity(Long id){
-        repo.increaseIssueQuantity(id);
-    }
-
-
-    public void decreaseIssueQuantity(Long id){
-        repo.decreaseIssueQuantity(id);
     }
 }

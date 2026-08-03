@@ -5,7 +5,6 @@ import com.arham.demo_project.Services.CustomMessage;
 import com.arham.demo_project.Services.ReportService;
 import com.arham.demo_project.Services.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +16,15 @@ import java.util.Map;
 @RequestMapping("/v1/library")
 public class ReportController {
 
-    @Autowired
-    private ReportService service;
-    @Autowired
-    private UserService userservice;
-    @Autowired
-    private CustomMessage MessageService;
+    private final ReportService service;
+    private final UserService userservice;
+    private final CustomMessage MessageService;
+
+    public ReportController(ReportService service, UserService userservice, CustomMessage MessageService) {
+        this.service = service;
+        this.userservice = userservice;
+        this.MessageService = MessageService;
+    }
 
     @GetMapping("/reports")
     List<Report> viewIssuedAllBooks(@RequestHeader("Authorization") String authHeader){

@@ -24,7 +24,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     @Query("select r from Report r where r.member_id = :member_id")
     public List<Report> getbooklistofuser(@Param("member_id") Long member_id);
 
-    @Query("select count(r)<=2 from Report r where r.member_id = :member_id and r.return_date is null")
+    @Query("select count(r)<3 from Report r where r.member_id = :member_id and r.return_date is null")
     public boolean howManybooks(@Param("member_id") Long member_id);
 
     @Query("select case when count(r) > 0 then true else false end " +

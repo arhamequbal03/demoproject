@@ -6,7 +6,6 @@ import com.arham.demo_project.Repositry.MemberRepository;
 import com.arham.demo_project.Repositry.MemberValidation;
 import com.arham.demo_project.Services.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +20,15 @@ import java.util.UUID;
 @RequestMapping("/v1/library")
 public class UserController {
 
-    @Autowired
-    private MemberValidation mepo;
+    private final MemberValidation mepo;
+    private final MemberRepository temp;
+    private final UserService service;
 
-    @Autowired
-    private MemberRepository temp;
-
-    @Autowired
-    private UserService service;
+    public UserController(MemberValidation mepo, MemberRepository temp, UserService service) {
+        this.mepo = mepo;
+        this.temp = temp;
+        this.service = service;
+    }
 
 //    @GetMapping("/getuser")
 //    public List<Member> getUser(){
@@ -52,7 +52,7 @@ public class UserController {
         if("ADMIN".equalsIgnoreCase(usr.getRole())) {
             service.adduser(comingUser);
             Map<String,Object> response = new LinkedHashMap<>();
-            response.put("messsage" , "User added successfully");
+            response.put("message" , "User added successfully");
             response.put("body" , comingUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
@@ -61,7 +61,7 @@ public class UserController {
     }
 
      @PutMapping("/users/{id}")
-     ResponseEntity<Map<String,Object>> updateUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id, @RequestBody Member info){
+     ResponseEntity<Map<String,Object>> updateUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id,@Valid @RequestBody Member info){
         UserObject usr=service.processInfo(authHeader);
         usr=service.userValidation(usr);
 

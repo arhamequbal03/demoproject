@@ -4,7 +4,6 @@ import com.arham.demo_project.Model.UserObject;
 import com.arham.demo_project.Services.BookService;
 import com.arham.demo_project.Services.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +17,13 @@ import java.util.Map;
 @RequestMapping("/v1/library")
 public class BookController {
 
-    @Autowired
-    private BookService service;
-    @Autowired
-    private UserService userservice;
+    private final BookService service;
+    private final UserService userservice;
+
+    public BookController(BookService service, UserService userservice) {
+        this.service = service;
+        this.userservice = userservice;
+    }
 
     @GetMapping("/books")
     List<Book> getBooks(@RequestHeader("Authorization") String authHeader){
