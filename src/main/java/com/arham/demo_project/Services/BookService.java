@@ -59,6 +59,12 @@ public class BookService {
         return repo.isavailable(id);
     }
 
+    // Fetches the book with a row lock; must be called inside a transaction.
+    public Book getBookForUpdate(Long id){
+        return repo.findByIdForUpdate(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "book is unavailable"));
+    }
+
     public void increaseIssueQuantity(Long id){
         repo.increaseIssueQuantity(id);
     }

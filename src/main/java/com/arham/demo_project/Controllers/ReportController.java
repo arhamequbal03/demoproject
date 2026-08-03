@@ -1,7 +1,6 @@
 package com.arham.demo_project.Controllers;
 import com.arham.demo_project.Model.Report;
 import com.arham.demo_project.Model.UserObject;
-import com.arham.demo_project.Services.BookService;
 import com.arham.demo_project.Services.CustomMessage;
 import com.arham.demo_project.Services.ReportService;
 import com.arham.demo_project.Services.UserService;
@@ -20,8 +19,6 @@ public class ReportController {
 
     @Autowired
     private ReportService service;
-    @Autowired
-    private BookService bookservice;
     @Autowired
     private UserService userservice;
     @Autowired
@@ -81,15 +78,11 @@ public class ReportController {
 
         if("ADMIN".equalsIgnoreCase(usr.getRole())){
             Long MemberId=r1.getMember_id();
-            Long BookId=r1.getBook_id();
             if(MemberId==null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"member_id is required");
             userservice.validuser(MemberId); // throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Invalid user");
-            bookservice.isavailable(BookId); // throw new ResponseStatusException(HttpStatus.NOT_FOUND,"book is unavailable");
-            service.howManybooks(MemberId);  // throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Borrow Limit already reached");
-            if(service.doesbothexistsandhavenull(MemberId,BookId))
-                throw new ResponseStatusException(HttpStatus.CONFLICT
-                        , "Book is already with user");
-            Map<String,Object> response= MessageService.GenerateIssueMessage(r1);
+            // availability, borrow-limit and duplicate checks now run inside the transaction
+            Report saved = service.issueBook(r1);
+            Map<String,Object> response= MessageService.GenerateIssueMessage(saved);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }else
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this operation");
@@ -110,6 +103,7 @@ public class ReportController {
             if (!service.doesbothexistsandhavenull(MemberId, BookId))
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User has not issued this book");
 
+            service.returnBook(MemberId, BookId);
             Map<String ,Object> response= MessageService.GenerateReturnMessage(MemberId,BookId);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {

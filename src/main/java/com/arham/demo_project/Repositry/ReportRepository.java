@@ -15,17 +15,17 @@ import java.util.List;
 public interface ReportRepository extends JpaRepository<Report, Long> {
     @Query("select case when count(r) > 0 then true else false end " +
             "from Report r where r.member_id = :member_id")
-    public boolean finduserbyid(@Param("member_id") Long memeber_id);
+    public boolean finduserbyid(@Param("member_id") Long member_id);
 
     @Query("select case when count(r) > 0 then true else false end " +
             "from Report r where r.member_id = :member_id and r.return_date is null")
     public boolean hasOpenBooks(@Param("member_id") Long member_id);
 
     @Query("select r from Report r where r.member_id = :member_id")
-    public List<Report> getbooklistofuser(@Param("member_id") Long memeber_id);
+    public List<Report> getbooklistofuser(@Param("member_id") Long member_id);
 
     @Query("select count(r)<=2 from Report r where r.member_id = :member_id and r.return_date is null")
-    public boolean howManybooks(@Param("member_id") Long memeber_id);
+    public boolean howManybooks(@Param("member_id") Long member_id);
 
     @Query("select case when count(r) > 0 then true else false end " +
             "from Report r where r.book_id = :book_id")
