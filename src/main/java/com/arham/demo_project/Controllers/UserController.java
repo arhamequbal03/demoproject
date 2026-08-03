@@ -1,0 +1,95 @@
+package com.arham.demo_project.Controllers;
+
+import com.arham.demo_project.Model.Member;
+import com.arham.demo_project.Model.UserObject;
+import com.arham.demo_project.Repositry.MemberRepository;
+import com.arham.demo_project.Repositry.MemberValidation;
+import com.arham.demo_project.Services.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/v1/library")
+public class UserController {
+
+    private final MemberValidation mepo;
+    private final MemberRepository temp;
+    private final UserService service;
+
+    public UserController(MemberValidation mepo, MemberRepository temp, UserService service) {
+        this.mepo = mepo;
+        this.temp = temp;
+        this.service = service;
+    }
+
+//    @GetMapping("/getuser")
+//    public List<Member> getUser(){
+//        return temp.findAll();
+//    }
+
+    @PostMapping("/login")
+    UUID loginUser(@RequestHeader("Authorization") String authHeader) {
+        UserObject user=service.processInfo(authHeader);
+        user=service.userValidation(user);
+        UUID gen= UUID.randomUUID();
+        return gen;
+    }
+
+    @PostMapping("/users")
+    ResponseEntity<Map<String,Object>> addUser(@RequestHeader("Authorization") String authHeader,@Valid @RequestBody Member comingUser){
+        UserObject usr=service.processInfo(authHeader);
+        usr=service.userValidation(usr);
+
+        comingUser=comingUser.memberValidation(comingUser);
+        if("ADMIN".equalsIgnoreCase(usr.getRole())) {
+            service.adduser(comingUser);
+            Map<String,Object> response = new LinkedHashMap<>();
+            response.put("message" , "User added successfully");
+            response.put("body" , comingUser);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        else
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this operation");
+    }
+
+     @PutMapping("/users/{id}")
+     ResponseEntity<Map<String,Object>> updateUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id,@Valid @RequestBody Member info){
+        UserObject usr=service.processInfo(authHeader);
+        usr=service.userValidation(usr);
+
+        if("ADMIN".equalsIgnoreCase(usr.getRole())) {
+            Member updated=service.editById(id, info);
+            Map<String,Object> response = new LinkedHashMap<>();
+            response.put("messsage" , "User modified successfully");
+            response.put("body" , updated);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        else
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this operation");
+    }
+
+    @DeleteMapping("/users/{id}")
+    ResponseEntity<Map<String,Object>>deleteUser(@RequestHeader("Authorization") String authHeader,@PathVariable Long id){
+        UserObject usr=service.processInfo(authHeader);
+        usr=service.userValidation(usr);
+        if("ADMIN".equalsIgnoreCase(usr.getRole())) {
+            if(id.equals(service.getId(usr.getName())))
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,"You can't delete your own account");
+            Member user =service.deleteById(id);
+            Map<String,Object> response = new LinkedHashMap<>();
+            response.put("messsage" , "User deleted successfully");
+            response.put("body" , user);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        else
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"you are not authorized to perform this operation");
+    }
+}
